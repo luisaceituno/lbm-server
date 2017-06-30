@@ -19,9 +19,12 @@ def get_songlist(lon, lat):
 
 @main.route("/post/vote/", methods=['POST'])
 def post_vote():
-    post = request.data
-    return post
+    engine = Engine()
+    data = request.get_json(force = True)
+    data = json.dumps(data)
+    engine.post_vote(data)
 
+    return "success"
 
 def create_app():
     app = Flask(__name__)
