@@ -29,7 +29,6 @@ class Engine():
     def get_top_ratings(self, aggregatedVoteList):
         variables = aggregatedVoteList[0].keys()
         df = pd.DataFrame([[getattr(i,j) for j in variables] for i in aggregatedVoteList], columns = variables)
-        df.sort_values('rating', ascending=False).head(5)
-        df.to_dict()
+        return df.sort_values('rating', ascending=False).head(5).to_dict()
 
                    
