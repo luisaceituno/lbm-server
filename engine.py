@@ -1,3 +1,5 @@
+import pandas as pd
+
 
 class Engine():
 
@@ -5,6 +7,7 @@ class Engine():
         pass
 
     def get_top_songlist(self, lon, lat):
+  
 
         
 
@@ -21,4 +24,12 @@ class Engine():
                     aggregatedVote.rating += vote.rating
                     timedelta = aggregatedVote.created_time.timestamp() - vote.created_time.timestamp()
                     aggregatedVote.created_time = aggregatedVote.created_time + timedelta
-        return[aggregatedVoteList]
+        return aggregatedVoteList
+
+    def get_top_ratings(self, aggregatedVoteList):
+        variables = aggregatedVoteList[0].keys()
+        df = pd.DataFrame([[getattr(i,j) for j in variables] for i in aggregatedVoteList], columns = variables)
+        df.sort_values('rating', ascending=False).head(5)
+        df.to_dict()
+
+                   
