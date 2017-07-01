@@ -3,7 +3,8 @@ import json
 from flask import jsonify
 from bson import json_util
 import pandas as pd
-from datetime import datetime
+#from datetime import datetime
+import datetime
 
 TIME_BASE_FACTOR = 21600
 
@@ -18,8 +19,8 @@ class Engine():
         vote = json.loads(data)
         self.db.insert_vote(vote)
 
-    def get_top_songlist(self, lon, lat):  
-        votes= self.db.get_votes_by_loc(lon,lat, 100)
+    def get_top_songlist(self, lon, lat, radius):  
+        votes= self.db.get_votes_by_loc(lon,lat, radius)
         votes = self.calculate_rating(votes)
 
         aggrVotes = self.aggregate_votes(votes)
@@ -37,13 +38,14 @@ class Engine():
             while insert == True:
                 for aggregated_vote in aggregated_votelist:
                     if vote['song_id'] == aggregated_vote['song_id']:
-                        aggregated_vote['rating'] += vote['rating']
+                        aggregated_vote['rating'] += vote['rating'] #interpreted as string??
                         timedelta = aggregated_vote['created_time'].timestamp() - vote['created_time'].timestamp()
                         avg_time = aggregated_vote['created_time'].timestamp() - timedelta
-                        aggregated_vote['created_time'] = datetime.fromtimestamp(avg_time)
+                        aggregated_vote['created_time'] = datetime.datetime.fromtimestamp(avg_time)
                         insert = False
-                    if insert == True:
-                        aggregated_votelist.append(vote)
+                if insert == True:
+                    aggregated_votelist.append(vote)
+                    insert = False
         return aggregated_votelist
 
     def get_top_ratings(self, aggregated_votelist):
@@ -58,7 +60,7 @@ class Engine():
                    
     def calculate_rating(self, aggregated_votelist):
         for vote in aggregated_votelist:
-            time_delta = (datetime.now().timestamp() - vote['created_time'].timestamp() ) 
+            time_delta = (datetime.datetime.now().timestamp() - vote['created_time'].timestamp() ) 
             time_factor = 1
             if time_delta > TIME_BASE_FACTOR and time_delta <= TIME_BASE_FACTOR*2:
                 time_factor = 0.875
