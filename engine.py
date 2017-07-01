@@ -3,7 +3,6 @@ import json
 from flask import jsonify
 from bson import json_util
 import pandas as pd
-#from datetime import datetime
 import datetime
 
 TIME_BASE_FACTOR = 21600

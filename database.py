@@ -19,6 +19,6 @@ class MongoDb():
 
     #maxDistance in meters
     def get_votes_by_loc(self, lon, lat, range):
-        votes = self.db.vote.find( {"location": SON([("$near", [lon, lat]), ("$maxDistance", range)])}).limit(30)
+        votes = self.db.vote.find( {"location": SON([("$near", [lon, lat]), ("$maxDistance", range)])}).limit(80)
         return list(votes)
 
