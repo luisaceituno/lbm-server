@@ -22,13 +22,14 @@ class Engine():
         #         "lat": ...
         #     }
         #     songs : [
-        #         {"id": , "rating": }
-        #     ]
+        #         {"id": , 
+        #          "rating": }
+        #               ]
 
         # }
         return test
 
     def post_vote(self, data):
         vote = json.loads(data)
-        self.db.insert_vote(vote[0])
+        self.db.insert_vote(vote)
 
