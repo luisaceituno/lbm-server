@@ -10,32 +10,35 @@ class Engine():
     def __init__(self):
         self.db = MongoDb()
 
-    def get_top_songlist(self, lon, lat):
-        votes =  self.db.get_votes_by_loc(lon, lat, 1)
-        test = json.dumps(votes, default=json_util.default)
-
-
-        # locationSongs:{
-
-        #     location:{
-        #         "lon": ..,
-        #         "lat": ...
-        #     }
-        #     songs : [
-        #         {"id": , 
-        #          "rating": }
-        #               ]
-
-        # }
-        return test
-
-
-    def get_charts_for_city(self, lon, lat):
-
-        return ""
-
-
     def post_vote(self, data):
         vote = json.loads(data)
         self.db.insert_vote(vote)
 
+    def get_top_songlist(self, lon, lat):  
+        votes= self.db.get_votes_by_loc(lon,lat,1)
+        aggrVotes = self.aggregate_votes(votes)
+        top_dict = self.get_top_ratings(aggrVotes)
+        del top_dict['url', 'location', 'created_time']
+        top_list = json.dumps(top_dict)
+        locationsongs = { "location": { "lon": lon, "lat": lat }, "songs": top_list}
+        return locationsongs
+
+    def aggregate_votes(self, voteList):
+        aggregatedVoteList = [voteList[0]]
+        for vote in voteList:  
+            for aggregatedVote in aggregatedVoteList:
+
+                if vote.song_id != aggregatedVote.song_id:
+                    aggregatedVoteList.append(vote)
+                else:
+                    aggregatedVote.rating += vote.rating
+                    timedelta = aggregatedVote.created_time.timestamp() - vote.created_time.timestamp()
+                    aggregatedVote.created_time = aggregatedVote.created_time + timedelta
+        return aggregatedVoteList
+
+    def get_top_ratings(self, aggregatedVoteList):
+        variables = aggregatedVoteList[0].keys()
+        df = pd.DataFrame([[getattr(i,j) for j in variables] for i in aggregatedVoteList], columns = variables)
+        return df.sort_values('rating', ascending=False).head(5).to_dict()
+
+                   
