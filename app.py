@@ -12,6 +12,7 @@ def status_up():
     return "Server is up!"
 
 @main.route("/get/songlist/<float:lon>/<float:lat>")
+@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def get_songlist(lon, lat):
     engine = Engine()
     songlist = engine.get_top_songlist(lon, lat, 250) #radius => 250m 

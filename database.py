@@ -5,6 +5,8 @@ from bson.son import SON
 import json
 import time
 
+VOTES_LIMIT_COUNT = 120 #just for presentation purposes
+
 class MongoDb():
     client = MongoClient("mongodb://localhost:27017")
     db = client.admin
@@ -19,6 +21,6 @@ class MongoDb():
 
     #maxDistance in meters
     def get_votes_by_loc(self, lon, lat, range):
-        votes = self.db.vote.find( {"location": SON([("$near", [lon, lat]), ("$maxDistance", range)])}).limit(80)
+        votes = self.db.vote.find( {"location": SON([("$near", [lon, lat]), ("$maxDistance", range)])}).limit(VOTES_LIMIT_COUNT)
         return list(votes)
 
