@@ -19,7 +19,7 @@ class Engine():
         self.db.insert_vote(vote)
 
     def get_top_songlist(self, lon, lat):  
-        votes= self.db.get_votes_by_loc(lon,lat,100)
+        votes= self.db.get_votes_by_loc(lon,lat, 100)
         votes = self.calculate_rating(votes)
 
         aggrVotes = self.aggregate_votes(votes)
@@ -31,24 +31,24 @@ class Engine():
         return location_songs
 
     def aggregate_votes(self, voteList):
-        aggregatedVoteList = [voteList[0]]
+        aggregated_votelist = [voteList[0]]
         for vote in voteList:
             insert = True
             while insert == True:
-                for aggregatedVote in aggregatedVoteList:
-                    if vote['song_id'] == aggregatedVote['song_id']:
-                        aggregatedVote['rating'] += vote['rating']
-                        timedelta = aggregatedVote['created_time'].timestamp() - vote['created_time'].timestamp()
-                        avg_time = aggregatedVote['created_time'].timestamp() + timedelta
-                        aggregatedVote['created_time'] = datetime.fromtimestamp(avg_time)
+                for aggregated_vote in aggregated_votelist:
+                    if vote['song_id'] == aggregated_vote['song_id']:
+                        aggregated_vote['rating'] += vote['rating']
+                        timedelta = aggregated_vote['created_time'].timestamp() - vote['created_time'].timestamp()
+                        avg_time = aggregated_vote['created_time'].timestamp() - timedelta
+                        aggregated_vote['created_time'] = datetime.fromtimestamp(avg_time)
                         insert = False
                     if insert == True:
-                        aggregatedVoteList.append(vote)
-        return aggregatedVoteList
+                        aggregated_votelist.append(vote)
+        return aggregated_votelist
 
-    def get_top_ratings(self, aggregatedVoteList):
-        variables = aggregatedVoteList[0].keys()
-        df_votes = pd.DataFrame(aggregatedVoteList)
+    def get_top_ratings(self, aggregated_votelist):
+        variables = aggregated_votelist[0].keys()
+        df_votes = pd.DataFrame(aggregated_votelist)
         df_votes_sorted = df_votes.sort_values('rating', ascending = False)
 
         df_votes_sorted.drop_duplicates('song_id', keep='first', inplace = True)
@@ -56,8 +56,8 @@ class Engine():
 
         return df_votes_sorted.to_dict(orient='records')
                    
-    def calculate_rating(self, aggregatedVoteList):
-        for vote in aggregatedVoteList:
+    def calculate_rating(self, aggregated_votelist):
+        for vote in aggregated_votelist:
             time_delta = (datetime.now().timestamp() - vote['created_time'].timestamp() ) 
             time_factor = 1
             if time_delta > TIME_BASE_FACTOR and time_delta <= TIME_BASE_FACTOR*2:
@@ -69,4 +69,4 @@ class Engine():
             elif time_delta > TIME_BASE_FACTOR*5:
                 time_factor = 0.5
             vote['rating'] *= time_factor
-        return aggregatedVoteList
+        return aggregated_votelist

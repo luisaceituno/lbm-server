@@ -5,7 +5,6 @@ from bson.son import SON
 import json
 import time
 
-
 class MongoDb():
     client = MongoClient("mongodb://localhost:27017")
     db = client.admin
@@ -19,6 +18,6 @@ class MongoDb():
         self.db.vote.insert_one(vote)
 
     def get_votes_by_loc(self, lon, lat, range):
-        votes = self.db.vote.find( {"location": SON([("$near", [lon, lat]), ("$maxDistance", range)])}).limit(10)
+        votes = self.db.vote.find( {"location": SON([("$near", [lon, lat]), ("$maxDistance", range)])}).limit(15)
         return list(votes)
 
