@@ -29,6 +29,12 @@ class Engine():
         # }
         return test
 
+
+    def get_charts_for_city(self, lon, lat):
+
+        return ""
+
+
     def post_vote(self, data):
         vote = json.loads(data)
         self.db.insert_vote(vote)
