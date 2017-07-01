@@ -10,12 +10,11 @@ main = Blueprint('main', __name__)
 def status_up():
     return "Server is up!"
 
-
 @main.route("/get/songlist/<float:lon>/<float:lat>")
 def get_songlist(lon, lat):
     engine = Engine()
     songlist = engine.get_top_songlist(lon, lat)
-    return songlist
+    return json.dumps(songlist)
 
 @main.route("/post/vote/", methods=['POST'])
 def post_vote():
@@ -23,7 +22,6 @@ def post_vote():
     data = request.get_json(force = True)
     data = json.dumps(data)
     engine.post_vote(data)
-
     return "success"
 
 def create_app():
@@ -31,3 +29,6 @@ def create_app():
     app.register_blueprint(main)
     return app
 
+
+s = get_songlist(8, 49)
+print(s)
